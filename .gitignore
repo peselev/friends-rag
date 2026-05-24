@@ -1,0 +1,24 @@
+# Secrets - NEVER commit these
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Vector DB (we'll decide later whether to commit)
+chroma_db/
+
+# Notebooks scratch
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+.cursor/
