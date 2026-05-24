@@ -22,3 +22,6 @@ Thumbs.db
 .vscode/
 .idea/
 .cursor/
+
+# Raw data is large; download via curl loop, don't commit
+data/raw/*.json
