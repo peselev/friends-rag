@@ -11,6 +11,9 @@ venv/
 # Vector DB (we'll decide later whether to commit)
 chroma_db/
 
+# Raw data - 130MB, can be re-downloaded via the curl loop in README
+data/raw/*.json
+
 # Notebooks scratch
 .ipynb_checkpoints/
 
@@ -23,5 +26,3 @@ Thumbs.db
 .idea/
 .cursor/
 
-# Raw data is large; download via curl loop, don't commit
-data/raw/*.json

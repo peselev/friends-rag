@@ -8,10 +8,8 @@ from dataclasses import dataclass
 
 import chromadb
 
-from src.config import CHROMA_DIR, TOP_K
+from src.config import CHROMA_DIR, SCENE_COLLECTION, TOP_K
 from src.embedder import embed_one
-
-COLLECTION_NAME = "friends_scenes"
 
 
 @dataclass
@@ -24,23 +22,34 @@ class RetrievalResult:
 
     @property
     def citation(self) -> str:
-        """Human-readable scene reference like 'S01E05, Scene 3'."""
+        """Human-readable scene reference. Falls back gracefully for naive chunks."""
         m = self.metadata
-        return f"S{m['season']:02d}E{m['episode']:02d}, Scene {m['scene_num']}"
+        if "season" in m:
+            return f"S{m['season']:02d}E{m['episode']:02d}, Scene {m['scene_num']}"
+        if "started_in_scene" in m:
+            return f"naive chunk (started in {m['started_in_scene']})"
+        return "(unknown source)"
 
 
-# Open the collection once at import time. Chroma's PersistentClient is
-# cheap to create but caching avoids the noise of doing it per query.
 _client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-_collection = _client.get_collection(COLLECTION_NAME)
+_collections: dict[str, chromadb.Collection] = {}
 
 
-def retrieve(query: str, top_k: int = TOP_K) -> list[RetrievalResult]:
-    """
-    Retrieve the top-k most semantically similar scenes for a query.
-    """
+def _get_collection(name: str) -> chromadb.Collection:
+    if name not in _collections:
+        _collections[name] = _client.get_collection(name)
+    return _collections[name]
+
+
+def retrieve_from_collection(
+    query: str,
+    top_k: int,
+    collection_name: str,
+) -> list[RetrievalResult]:
+    """Retrieve top-k from a named Chroma collection."""
+    collection = _get_collection(collection_name)
     query_vec = embed_one(query)
-    raw = _collection.query(
+    raw = collection.query(
         query_embeddings=[query_vec],
         n_results=top_k,
     )
@@ -61,6 +70,13 @@ def retrieve(query: str, top_k: int = TOP_K) -> list[RetrievalResult]:
             distance=dist,
         ))
     return results
+
+
+def retrieve(query: str, top_k: int = TOP_K) -> list[RetrievalResult]:
+    """
+    Retrieve the top-k most semantically similar scenes for a query.
+    """
+    return retrieve_from_collection(query, top_k, SCENE_COLLECTION)
 
 
 def format_for_prompt(results: list[RetrievalResult]) -> str:

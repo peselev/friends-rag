@@ -37,3 +37,5 @@ GENERATION_MODEL = "claude-haiku-4-5"        # Anthropic: fast + cheap for demo
 
 # Retrieval settings
 TOP_K = 5   # Number of chunks to retrieve per query
+SCENE_COLLECTION = "friends_scenes"
+NAIVE_COLLECTION = "friends_naive"
