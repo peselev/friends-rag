@@ -1,7 +1,7 @@
 # Core RAG dependencies
 chromadb==0.5.23           # Vector database (local, no service needed)
 openai==2.38.0             # For embeddings only
-anthropic==0.39.0          # For LLM generation
+anthropic==0.104.1          # For LLM generation
 
 # Data handling
 python-dotenv==1.0.1       # Load .env file

@@ -2,9 +2,13 @@
 Central configuration. All settings and API keys live here so we only
 read environment variables in one place.
 """
+import logging
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Silence Chroma telemetry warnings (version mismatch issue, not our concern)
+logging.getLogger("chromadb.telemetry").setLevel(logging.CRITICAL)
 
 # Load .env file from project root
 PROJECT_ROOT = Path(__file__).parent.parent
