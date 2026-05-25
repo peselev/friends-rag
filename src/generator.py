@@ -1,15 +1,13 @@
 """
 Generator: take a question + retrieved context, ask Claude to answer.
-
-This is the "Generation" in RAG. The retriever found relevant scenes;
-this module is what turns them into an actual answer.
 """
 from dataclasses import dataclass
 
 from anthropic import Anthropic
 
 from src.config import ANTHROPIC_API_KEY, GENERATION_MODEL, TOP_K
-from src.retriever import retrieve, format_for_prompt, RetrievalResult
+from src.retriever import format_for_prompt, RetrievalResult
+from src.unified_retriever import retrieve_unified
 
 
 _client = Anthropic(api_key=ANTHROPIC_API_KEY)
@@ -31,10 +29,10 @@ class RAGAnswer:
     question: str
     answer: str
     sources: list[RetrievalResult]
+    mode: str
 
 
 def build_user_prompt(question: str, results: list[RetrievalResult]) -> str:
-    """Assemble the user-turn prompt: context block + question."""
     context = format_for_prompt(results)
     return (
         f"Here are some scene excerpts from Friends:\n\n"
@@ -45,37 +43,32 @@ def build_user_prompt(question: str, results: list[RetrievalResult]) -> str:
     )
 
 
-def answer_question(question: str, top_k: int = TOP_K) -> RAGAnswer:
+def answer_question(question: str, mode: str = "vector", top_k: int = TOP_K) -> RAGAnswer:
     """
-    Retrieve relevant scenes and ask Claude to answer the question.
-    Returns the answer text and the sources that were retrieved.
+    Retrieve relevant scenes using the given mode, then ask Claude to answer.
     """
-    # Step 1: retrieve
-    sources = retrieve(question, top_k=top_k)
-
-    # Step 2: build prompt
+    sources = retrieve_unified(question, mode=mode, top_k=top_k)
     user_prompt = build_user_prompt(question, sources)
 
-    # Step 3: ask Claude
     response = _client.messages.create(
         model=GENERATION_MODEL,
         max_tokens=1024,
-        temperature=0.3,   # Low: we want factual consistency, not creativity
+        temperature=0.3,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_prompt}],
     )
     answer_text = response.content[0].text
 
-    return RAGAnswer(question=question, answer=answer_text, sources=sources)
+    return RAGAnswer(question=question, answer=answer_text, sources=sources, mode=mode)
 
 
 if __name__ == "__main__":
-    # CLI: python -m src.generator "your question here"
     import sys
     question = sys.argv[1] if len(sys.argv) > 1 else "What does Ross yell when moving a couch?"
+    mode = sys.argv[2] if len(sys.argv) > 2 else "vector"
 
-    print(f"Q: {question}\n")
-    result = answer_question(question)
+    print(f"Q: {question}\nMode: {mode}\n")
+    result = answer_question(question, mode=mode)
 
     print(f"A: {result.answer}\n")
     print(f"--- Sources used ---")
