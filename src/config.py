@@ -27,6 +27,8 @@ if not OPENAI_API_KEY:
 # Paths
 DATA_RAW = PROJECT_ROOT / "data" / "raw"
 DATA_PROCESSED = PROJECT_ROOT / "data" / "processed"
+CHUNKS_JSONL = DATA_PROCESSED / "chunks.jsonl"
+BM25_INDEX_PATH = DATA_PROCESSED / "bm25_index.pkl"
 CHROMA_DIR = PROJECT_ROOT / "chroma_db"
 
 # Model choices
