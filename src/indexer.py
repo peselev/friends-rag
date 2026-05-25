@@ -1,27 +1,34 @@
 """
-Indexer: read chunks.jsonl, embed them in batches, store in Chroma.
+Indexer: read chunks JSONL, embed in batches, store in Chroma.
 
-Run with:
-    python -m src.indexer              # full corpus
-    python -m src.indexer --limit 100  # smoke test with first 100 chunks
+Examples:
+    # Scene chunks (default - same as Weekend 1)
+    python -m src.indexer
+
+    # Naive chunks into a separate collection
+    python -m src.indexer --chunks data/processed/chunks_naive.jsonl --collection friends_naive
+
+    # Smoke test with first 100
+    python -m src.indexer --limit 100
 """
 import argparse
 import json
+from pathlib import Path
 
 import chromadb
 
 from src.config import DATA_PROCESSED, CHROMA_DIR
 from src.embedder import embed_texts
 
-COLLECTION_NAME = "friends_scenes"
+DEFAULT_COLLECTION = "friends_scenes"
+DEFAULT_CHUNKS_FILE = DATA_PROCESSED / "chunks.jsonl"
 BATCH_SIZE = 100
 
 
-def load_chunks(limit: int | None = None) -> list[dict]:
-    """Read chunks.jsonl into memory."""
-    chunks_path = DATA_PROCESSED / "chunks.jsonl"
+def load_chunks(path: Path, limit: int | None = None) -> list[dict]:
+    """Read a chunks JSONL file into memory."""
     chunks = []
-    with open(chunks_path) as f:
+    with open(path) as f:
         for i, line in enumerate(f):
             if limit is not None and i >= limit:
                 break
@@ -30,11 +37,7 @@ def load_chunks(limit: int | None = None) -> list[dict]:
 
 
 def get_or_reset_collection(client, name: str):
-    """
-    Delete the collection if it exists, then recreate.
-    Re-running the indexer always produces a fresh index from scratch.
-    Simpler and safer than partial updates while we're still iterating.
-    """
+    """Delete the collection if it exists, then recreate. Fresh index every run."""
     existing = [c.name for c in client.list_collections()]
     if name in existing:
         print(f"  (Deleting existing '{name}' collection)")
@@ -42,17 +45,17 @@ def get_or_reset_collection(client, name: str):
     return client.create_collection(name=name)
 
 
-def index_chunks(limit: int | None = None):
+def index_chunks(chunks_path: Path, collection_name: str, limit: int | None = None):
     """Main entry point."""
-    print(f"Loading chunks (limit={limit})...")
-    chunks = load_chunks(limit=limit)
+    print(f"Loading chunks from {chunks_path.name} (limit={limit})...")
+    chunks = load_chunks(chunks_path, limit=limit)
     print(f"  Loaded {len(chunks):,} chunks")
 
     print(f"\nConnecting to Chroma at {CHROMA_DIR}...")
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-    collection = get_or_reset_collection(client, COLLECTION_NAME)
+    collection = get_or_reset_collection(client, collection_name)
 
-    print(f"\nEmbedding and indexing in batches of {BATCH_SIZE}...")
+    print(f"\nEmbedding and indexing into '{collection_name}' in batches of {BATCH_SIZE}...")
     n_batches = (len(chunks) + BATCH_SIZE - 1) // BATCH_SIZE
 
     for batch_num, start in enumerate(range(0, len(chunks), BATCH_SIZE), start=1):
@@ -73,14 +76,26 @@ def index_chunks(limit: int | None = None):
         print(f"  Batch {batch_num}/{n_batches}: indexed {len(batch)} chunks")
 
     final_count = collection.count()
-    print(f"\nDone. Collection '{COLLECTION_NAME}' now contains {final_count:,} items.")
+    print(f"\nDone. Collection '{collection_name}' now contains {final_count:,} items.")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--chunks",
+        type=Path,
+        default=DEFAULT_CHUNKS_FILE,
+        help=f"Path to chunks JSONL file (default: {DEFAULT_CHUNKS_FILE})",
+    )
+    parser.add_argument(
+        "--collection",
+        type=str,
+        default=DEFAULT_COLLECTION,
+        help=f"Chroma collection name (default: {DEFAULT_COLLECTION})",
+    )
+    parser.add_argument(
         "--limit", type=int, default=None,
         help="Index only the first N chunks (for testing)",
     )
     args = parser.parse_args()
-    index_chunks(limit=args.limit)
+    index_chunks(chunks_path=args.chunks, collection_name=args.collection, limit=args.limit)
