@@ -1,6 +1,6 @@
 # Core RAG dependencies
 chromadb==0.5.23           # Vector database (local, no service needed)
-openai==1.54.0             # For embeddings only
+openai==2.38.0             # For embeddings only
 anthropic==0.39.0          # For LLM generation
 
 # Data handling
