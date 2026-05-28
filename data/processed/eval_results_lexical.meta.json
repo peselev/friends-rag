@@ -1,0 +1,27 @@
+[
+  {
+    "timestamp": "2026-05-28T04:06:37.521827+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25",
+      "hybrid_window_bm25_smart"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-05-28T11:05:08.700760+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25_reranked"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-05-28T12:55:56.737859+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25_reranked_bge"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  }
+]

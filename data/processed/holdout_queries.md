@@ -28,3 +28,33 @@ Expected ground-truth scenes:
 ## Other queries to add to holdout set
 
 (Build this list during Weekend 4 as you think of them — but only add queries we haven't already tested during development.)
+
+---
+
+## RESULT (run once, 05/28/26)
+
+Tested both demo-candidate modes (hybrid_window_bm25 and hybrid_window_bm25_reranked_bge)
+end-to-end (retrieval + Claude generation).
+
+**Core question — "Who was Joey in love with?" → Rachel.** Both modes answered
+correctly and confidently with cited dialogue. (Note: this query failed across
+individual vector/BM25 modes in Weekend 2; the full pipeline now succeeds.)
+
+**Per-query results:**
+- "Who was Joey in love with?" — Correct (Rachel). Answered via S09E19 evidence
+  rather than the S08E15/16 scenes anticipated. Valid alternate path.
+- "Who did Joey have feelings for in season 8?" — Correct. Fast mode hit S08E16
+  Scene 1 (Joey's "It's Rachel" confession to Ross) directly.
+- "What did Joey confess to Rachel at the restaurant?" — Correct. Both modes
+  retrieved S08E16 Scene 9 (the restaurant confession) at/near rank 1.
+
+**Predicted failure confirmed:** S08E17 ("Tea Leaves" reconciliation), flagged in
+advance as too heavily paraphrased, was not surfaced by any query. Prediction held.
+
+**Caveat:** evidence path varies with query phrasing. Specific phrasings retrieve
+the canonical scenes; general phrasings still reach the correct answer via
+alternate evidence. The system is robust to the answer; the retrieval path is
+phrasing-sensitive.
+
+**Conclusion:** System passes the holdout on the core question. Fast mode is good
+enough as default; reranked mode is a quality upgrade, not a necessity.
