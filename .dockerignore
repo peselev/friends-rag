@@ -1,0 +1,48 @@
+cat > .dockerignore << 'EOF'
+# Secrets — NEVER copy into image
+.env
+.env.*
+
+# Vector DB — bootstrap rebuilds on startup
+chroma_db/
+
+# Dev artifacts
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.git/
+.gitignore
+.cursor/
+.vscode/
+.idea/
+.DS_Store
+
+# Raw data (large, not needed at runtime)
+data/raw/
+
+# Eval artifacts (not needed at runtime)
+data/processed/eval_*.jsonl
+data/processed/eval_*.json
+data/processed/eval_*.md
+
+# Chunks files we don't need at runtime (demo only uses window_noheader)
+data/processed/chunks_naive.jsonl
+data/processed/chunks_utterance.jsonl
+data/processed/chunks_utterance_noheader.jsonl
+data/processed/chunks_window.jsonl
+data/processed/chunks.jsonl
+
+# Writeup drafts
+writeup/
+
+# Logs
+*.log
+
+# Local-only files
+app_compare.py
+test_keys.py
+run_eval_overnight.sh
+notebooks/
+EOF

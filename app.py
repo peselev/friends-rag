@@ -3,6 +3,10 @@ Friends RAG — grounded question-answering demo.
 
 Run with: streamlit run app.py
 """
+# Run bootstrap on first import (idempotent — does nothing if Chroma is ready)
+import bootstrap
+bootstrap.main()
+
 import os
 import streamlit as st
 

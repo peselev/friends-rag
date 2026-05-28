@@ -1,20 +1,18 @@
-# Core RAG dependencies
-chromadb==0.5.23           # Vector database (local, no service needed)
-openai==2.38.0             # For embeddings only
-anthropic==0.104.1          # For LLM generation
+# Core
+chromadb==0.5.23
+openai==2.38.0
+anthropic==0.104.1
+python-dotenv==1.0.1
+requests==2.32.3
 
-# Data handling
-python-dotenv==1.0.1       # Load .env file
-requests==2.32.3           # Download Emory dataset
+# UI
+streamlit==1.40.0
 
-# UI (Weekend 1 end)
-streamlit==1.40.0          # Quick web UI
+# Retrieval
+rank-bm25==0.2.2
 
-# Keyword search (Weekend 2 - your Cursor assignment)
-rank-bm25==0.2.2           # BM25 implementation
+# Reranker (also brings torch, transformers, tokenizers)
+sentence-transformers==5.5.1
 
-# Evaluation (Weekend 3)
-# numpy, pandas come as transitive deps of chromadb
-
-# reranker (Weekend 4)
-sentence-transformers>=3.0.0
+# Numerics (numpy comes via chromadb but pin to avoid surprises)
+numpy==2.4.6

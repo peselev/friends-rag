@@ -1,21 +1,30 @@
-# Friends RAG
+---
+title: Friends RAG
+emoji: ☕
+colorFrom: indigo
+colorTo: gray
+sdk: docker
+app_port: 8501
+tags:
+- streamlit
+- rag
+- retrieval-augmented-generation
+pinned: false
+short_description: Ask anything about Friends. Answers come with citations - and "I don't know" when transcripts don't say.
+license: mit
+---
 
-A Retrieval-Augmented Generation system over the transcripts of the TV show *Friends*, built to demonstrate and compare different retrieval strategies (vector search, keyword search, hybrid) with rigorous evaluation against a Q&A benchmark.
+# Friends — Grounded Q&A
 
-## Setup
+Retrieval-augmented question answering over all 236 episodes of *Friends*.
+Every answer is grounded in actual scene transcripts, with citations to the
+exact episode and scene. If the transcripts don't contain the answer, the
+system says so rather than guessing.
 
-1. Clone this repo
-2. Copy `.env.example` to `.env` and add your API keys
-3. `pip install -r requirements.txt`
-4. `python -m src.loader` to download and process the dataset
-5. `python -m src.embedder` to build the vector index
-6. `streamlit run app.py` to launch the UI
+## How it works
 
-## Data
+- **Retrieval**: hybrid (BM25 keyword + window-level vector embeddings via OpenAI), with parent-scene resolution
+- **Optional re-ranking**: cross-encoder (`BAAI/bge-reranker-base`) for higher accuracy
+- **Generation**: Claude with a strict "use only retrieved scenes, cite them, refuse if insufficient" prompt
 
-Transcripts from [Emory NLP character-mining](https://github.com/emorynlp/character-mining):
-236 episodes, 3,107 scenes, ~1.1M tokens.
-
-## Status
-
-Work in progress.
+Built as a hands-on RAG learning project exploring retrieval design tradeoffs.
