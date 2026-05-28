@@ -111,18 +111,21 @@ def run_query(question: str, use_reranker: bool):
 
 
 EXAMPLES = [
-    ("What does Ross yell when moving a couch?",
-     "Iconic moment — tests exact-dialogue retrieval."),
-    ("How did Chandler propose to Monica?",
-     "Multi-scene answer — synthesizes across episodes."),
-    ("What is the name of Ross's pet monkey?",
-     "Deep-cut factual recall."),
-    ("Which cities did Ross consider moving to?",
-     "Try this with and without 'Higher accuracy' — the reranker shines here."),
+    ("Why did Ross and Rachel go on a break?",
+     "The famous fight — answered across multiple scenes."),
+
+    # --- Reranker-showcase questions (toggle visibly helps) ---
+    ("What is Monica showing off?",
+     "Try 'Higher accuracy' — different modes surface different scenes Monica was proud of."),
+    ("Who is catching an earlier flight?",
+     "'Higher accuracy' shines here — the fast mode misses this; reranker finds it."),
+    
     ("Who was Joey in love with?",
-     "Hard: implied across many scenes, never stated plainly."),
+     "Hard one: implied across many scenes, never stated plainly."),
+
+    # --- Governance demo ---
     ("What is the capital of France?",
-     "Should REFUSE — proves it only uses transcripts."),
+     "Watch it refuse — it only uses the transcripts, not outside knowledge."),
 ]
 
 # --- Session state ---
