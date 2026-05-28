@@ -30,10 +30,8 @@ def collection_exists_and_populated(client, name: str, expected_min: int = 1000)
 
 def main():
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-    client = chromadb.PersistentClient(
-        path=str(CHROMA_DIR),
-        settings=Settings(anonymized_telemetry=False),
-    )
+    
+    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
 
     if collection_exists_and_populated(client, WINDOW_NOHEADER_COLLECTION):
         print(f"[bootstrap] {WINDOW_NOHEADER_COLLECTION} already populated, skipping.")
