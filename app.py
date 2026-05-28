@@ -119,12 +119,16 @@ EXAMPLES = [
      "Try 'Higher accuracy' — different modes surface different scenes Monica was proud of."),
     ("Who is catching an earlier flight?",
      "'Higher accuracy' shines here — the fast mode misses this; reranker finds it."),
-    
+
+    # --- Synthesis over many scenes ---   
     ("Who was Joey in love with?",
-     "Hard one: implied across many scenes, never stated plainly."),
+     "Hard one — implied across many scenes, never stated plainly."),
+    ("Who worked at Central Perk cafe?",
+    "A who's-who question — answer requires scanning many scenes."),
+
 
     # --- Governance demo ---
-    ("What is the capital of France?",
+    ("What is the capital of England?",
      "Watch it refuse — it only uses the transcripts, not outside knowledge."),
 ]
 
@@ -160,7 +164,7 @@ with st.form("ask_form"):
         st.text_input(
             "Your question:",
             key="question_input",
-            placeholder="Type your question here",
+            placeholder="Type your question (more context helps the system find the right scenes).",
             label_visibility="collapsed",
         )
     with c2:
