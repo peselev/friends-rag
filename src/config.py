@@ -42,3 +42,6 @@ NAIVE_COLLECTION = "friends_naive"
 # New for granularity experiment
 UTTERANCE_COLLECTION = "friends_utterance"
 WINDOW_COLLECTION = "friends_window"
+# Header-less variants for the prefix-impact experiment
+UTTERANCE_NOHEADER_COLLECTION = "friends_utterance_noheader"
+WINDOW_NOHEADER_COLLECTION = "friends_window_noheader"

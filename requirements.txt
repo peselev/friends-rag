@@ -15,3 +15,6 @@ rank-bm25==0.2.2           # BM25 implementation
 
 # Evaluation (Weekend 3)
 # numpy, pandas come as transitive deps of chromadb
+
+# reranker (Weekend 4)
+sentence-transformers>=3.0.0

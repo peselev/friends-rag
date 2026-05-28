@@ -21,7 +21,7 @@ from src.config import DATA_PROCESSED
 from src.unified_retriever import retrieve_unified, AVAILABLE_MODES
 
 TOP_K_FOR_EVAL = 10
-MAX_WORKERS = 8
+MAX_WORKERS = 4
 
 DEFAULT_QUESTIONS = DATA_PROCESSED / "eval_sample.jsonl"
 DEFAULT_RESULTS = DATA_PROCESSED / "eval_results.jsonl"
@@ -30,8 +30,13 @@ DEFAULT_RESULTS = DATA_PROCESSED / "eval_results.jsonl"
 def find_rank(results, target_scene_id: str) -> int | None:
     """Return 1-indexed rank of target_scene_id in results, or None if absent."""
     for i, r in enumerate(results, start=1):
+        # Scene chunks: chunk id IS the scene_id
         if r.scene_id == target_scene_id:
             return i
+        # Utterance/window chunks: parent scene_id stored in metadata
+        if r.metadata.get("scene_id") == target_scene_id:
+            return i
+        # Naive chunks: started_in_scene metadata
         if r.metadata.get("started_in_scene") == target_scene_id:
             return i
     return None

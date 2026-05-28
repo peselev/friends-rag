@@ -26,3 +26,9 @@ Thumbs.db
 .idea/
 .cursor/
 
+
+# Eval run logs (transient)
+*.log
+
+# Writeup drafts (kept local until ready to publish)
+writeup/

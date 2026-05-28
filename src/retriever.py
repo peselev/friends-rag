@@ -28,8 +28,8 @@ class RetrievalResult:
             return f"S{m['season']:02d}E{m['episode']:02d}, Scene {m['scene_num']}"
         if "started_in_scene" in m:
             return f"naive chunk (started in {m['started_in_scene']})"
-        return "(unknown source)"
-
+        return "(unknown source)"   
+    
 
 _client = chromadb.PersistentClient(path=str(CHROMA_DIR))
 _collections: dict[str, chromadb.Collection] = {}
