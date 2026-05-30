@@ -10,7 +10,7 @@ tags:
 - rag
 - retrieval-augmented-generation
 pinned: false
-short_description: Ask anything about Friends. Answers come with citations - and "I don't know" when transcripts don't say.
+short_description: Ask anything about Friends. Answers come with citations.
 license: mit
 ---
 
