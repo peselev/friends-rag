@@ -8,8 +8,9 @@ from concurrent.futures import ThreadPoolExecutor
 import streamlit as st
 
 from src.generator import answer_question
-from src.unified_retriever import AVAILABLE_MODES
 
+# The four modes this comparison UI is built around.
+COMPARE_MODES = ["vector", "vector_naive", "bm25", "hybrid"]
 
 MODE_LABELS = {
     "vector": "Vector (scene chunks)",
@@ -60,14 +61,14 @@ if submit and question:
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = {
                 mode: executor.submit(answer_question, question, mode=mode)
-                for mode in AVAILABLE_MODES
+                for mode in COMPARE_MODES
             }
             results = {mode: f.result() for mode, f in futures.items()}
 
     # --- Answers in 4 columns ---
     st.markdown("## Answers")
-    cols = st.columns(len(AVAILABLE_MODES))
-    for col, mode in zip(cols, AVAILABLE_MODES):
+    cols = st.columns(len(COMPARE_MODES))
+    for col, mode in zip(cols, COMPARE_MODES):
         with col:
             st.markdown(f"### {MODE_LABELS[mode]}")
             st.caption(MODE_DESCRIPTIONS[mode])
@@ -75,7 +76,7 @@ if submit and question:
 
     # --- Sources, mode by mode, stacked ---
     st.markdown("## Sources retrieved per mode")
-    for mode in AVAILABLE_MODES:
+    for mode in COMPARE_MODES:
         with st.expander(f"{MODE_LABELS[mode]} — {len(results[mode].sources)} scenes"):
             for i, src in enumerate(results[mode].sources, start=1):
                 st.markdown(f"**{i}. {src.citation}** · distance: `{src.distance:.3f}`")

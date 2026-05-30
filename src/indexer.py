@@ -2,7 +2,7 @@
 Indexer: read chunks JSONL, embed in batches, store in Chroma.
 
 Examples:
-    # Scene chunks (default - same as Weekend 1)
+    # Scene chunks (default)
     python -m src.indexer
 
     # Naive chunks into a separate collection

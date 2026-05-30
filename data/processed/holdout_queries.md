@@ -27,7 +27,7 @@ Expected ground-truth scenes:
 
 ## Other queries to add to holdout set
 
-(Build this list during Weekend 4 as you think of them — but only add queries we haven't already tested during development.)
+(Build this list as you think of them — but only add queries we haven't already tested during development.)
 
 ---
 
@@ -38,7 +38,7 @@ end-to-end (retrieval + Claude generation).
 
 **Core question — "Who was Joey in love with?" → Rachel.** Both modes answered
 correctly and confidently with cited dialogue. (Note: this query failed across
-individual vector/BM25 modes in Weekend 2; the full pipeline now succeeds.)
+individual vector/BM25 modes in earlier development; the full pipeline now succeeds.)
 
 **Per-query results:**
 - "Who was Joey in love with?" — Correct (Rachel). Answered via S09E19 evidence

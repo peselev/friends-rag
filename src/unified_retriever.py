@@ -17,7 +17,6 @@ AVAILABLE_MODES = (
     "vector_utterance", "vector_window",
     "vector_utterance_noheader", "vector_window_noheader",
     "bm25", "hybrid",
-    "parent_scene", "parent_scene_reranked",
     "hybrid_window_bm25",
     "hybrid_window_bm25_smart",
     "hybrid_window_bm25_reranked",
@@ -75,17 +74,6 @@ def retrieve_unified(
         from src.reranker import rerank
         candidates = retrieve_hybrid_window(query, top_k=20)
         return rerank(query, candidates, top_k=top_k, model_name=BGE_RERANKER)
-
-    # Parent-child modes (lazy import: parent_child pulls in scene index;
-    # reranker pulls in torch)
-    if mode == "parent_scene":
-        from src.parent_child import retrieve_parent_scene
-        return retrieve_parent_scene(query, top_k=top_k)
-    if mode == "parent_scene_reranked":
-        from src.parent_child import retrieve_parent_scene
-        from src.reranker import rerank
-        candidates = retrieve_parent_scene(query, top_k=20)
-        return rerank(query, candidates, top_k=top_k)
 
     # Pure vector modes (dispatch by collection)
     collection_name = _MODE_TO_COLLECTION[mode]

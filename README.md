@@ -21,6 +21,8 @@ Every answer is grounded in actual scene transcripts, with citations to the
 exact episode and scene. If the transcripts don't contain the answer, the
 system says so rather than guessing.
 
+**Full write-up:** the design decisions, the evaluation, and what I learned building this are documented at [peselev.com/work/friends-rag](https://peselev.com/work/friends-rag/).
+
 ## How it works
 
 - **Retrieval**: hybrid (BM25 keyword + window-level vector embeddings via OpenAI), with parent-scene resolution
