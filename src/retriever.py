@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 import chromadb
 
-from src.config import CHROMA_DIR, SCENE_COLLECTION, TOP_K
+from src.config import CHROMA_DIR, EMBEDDING_MODEL, SCENE_COLLECTION, TOP_K
 from src.embedder import embed_one
 
 
@@ -45,10 +45,11 @@ def retrieve_from_collection(
     query: str,
     top_k: int,
     collection_name: str,
+    embedding_model: str = EMBEDDING_MODEL,
 ) -> list[RetrievalResult]:
     """Retrieve top-k from a named Chroma collection."""
     collection = _get_collection(collection_name)
-    query_vec = embed_one(query)
+    query_vec = embed_one(query, model=embedding_model)
     raw = collection.query(
         query_embeddings=[query_vec],
         n_results=top_k,

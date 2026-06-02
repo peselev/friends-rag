@@ -52,12 +52,21 @@ from tqdm import tqdm
 
 from src.config import (
     DATA_PROCESSED,
+    EMBEDDING_MODEL,
     SCENE_COLLECTION,
     WINDOW_NOHEADER_COLLECTION,
     UTTERANCE_NOHEADER_COLLECTION,
 )
 from src.bm25_retriever import retrieve_bm25
 from src.retriever import retrieve_from_collection
+
+# ----- Run-time embedding config (set in main from --embedding-model) -------
+# EMBED_MODEL: which OpenAI model to embed QUERIES with.
+# COLL_SUFFIX: appended to vector collection names ("" for small, "_large"
+#   for the large-model collections built by the indexer). BM25 is unaffected
+#   (keyword search uses no embeddings).
+EMBED_MODEL = EMBEDDING_MODEL
+COLL_SUFFIX = ""
 
 # --------------------------------------------------------------------------- #
 # Experiment configuration
@@ -105,8 +114,8 @@ SUB_POOLS = {
 
 DEFAULT_MAIN = DATA_PROCESSED / "eval_sample.jsonl"            # 800: direct + reworded
 DEFAULT_LEXICAL = DATA_PROCESSED / "eval_lexical_paraphrases.jsonl"  # 200: heavily reworded
-DEFAULT_RESULTS = DATA_PROCESSED / "coverage_results.jsonl"
-REPORT_PATH = DATA_PROCESSED / "coverage_report.md"
+# Output paths are derived in main() from the embedding model (small vs large)
+# so the two variants never overwrite each other.
 
 
 # --------------------------------------------------------------------------- #
@@ -128,16 +137,24 @@ def _dedupe_to_scenes(results, limit: int) -> list[str]:
 
 
 def ranked_scenes(query: str, mode: str, limit: int = K_MAX) -> list[str]:
-    """Return up to `limit` unique parent scene_ids, in retrieval order, for one mode."""
+    """Return up to `limit` unique parent scene_ids, in retrieval order, for one mode.
+
+    Vector modes use the module-level EMBED_MODEL to embed the query and read
+    from the COLL_SUFFIX-suffixed collection, so the same code path serves both
+    the small and large experiments. BM25 ignores both (no embeddings).
+    """
     fetch = FETCH_DEPTH[mode]
     if mode == "bm25":
         results = retrieve_bm25(query, top_k=fetch)
     elif mode == "vector":
-        results = retrieve_from_collection(query, fetch, SCENE_COLLECTION)
+        results = retrieve_from_collection(
+            query, fetch, SCENE_COLLECTION + COLL_SUFFIX, embedding_model=EMBED_MODEL)
     elif mode == "vector_window_noheader":
-        results = retrieve_from_collection(query, fetch, WINDOW_NOHEADER_COLLECTION)
+        results = retrieve_from_collection(
+            query, fetch, WINDOW_NOHEADER_COLLECTION + COLL_SUFFIX, embedding_model=EMBED_MODEL)
     elif mode == "vector_utterance_noheader":
-        results = retrieve_from_collection(query, fetch, UTTERANCE_NOHEADER_COLLECTION)
+        results = retrieve_from_collection(
+            query, fetch, UTTERANCE_NOHEADER_COLLECTION + COLL_SUFFIX, embedding_model=EMBED_MODEL)
     else:
         raise ValueError(f"Unknown mode in POOL: {mode!r}")
     return _dedupe_to_scenes(results, limit)
@@ -194,19 +211,20 @@ def prewarm_cache(questions: list[dict], batch_size: int = 256) -> None:
         if text in seen:
             continue
         seen.add(text)
-        if _cache.get(text) is None:
+        if _cache.get(text, model=EMBED_MODEL) is None:
             todo.append(text)
 
     if not todo:
         print("  Cache already warm - nothing to embed.")
         return
 
-    print(f"  Embedding {len(todo):,} uncached questions in batches of {batch_size}...")
+    print(f"  Embedding {len(todo):,} uncached questions with {EMBED_MODEL} "
+          f"in batches of {batch_size}...")
     for i in tqdm(range(0, len(todo), batch_size), desc="  Prewarm"):
         batch = todo[i:i + batch_size]
-        vectors = embed_texts(batch)
+        vectors = embed_texts(batch, model=EMBED_MODEL)
         for text, vec in zip(batch, vectors):
-            _cache.set(text, vec)
+            _cache.set(text, vec, model=EMBED_MODEL)
     _cache.save()
     print(f"  Cache now holds {len(_cache):,} query embeddings.")
 
@@ -421,6 +439,9 @@ def build_report(rows: list[dict]) -> str:
              "higher than the chunk-rank numbers in the writeup; for bm25 and "
              "scene-vector it is identical.\n")
     L.append(f"Pool: {', '.join(MODE_LABELS[m] for m in POOL)}\n")
+    L.append(f"Query embedding model: `{EMBED_MODEL}`"
+             + (f"  |  vector collections suffix: `{COLL_SUFFIX}`" if COLL_SUFFIX else "")
+             + "\n")
 
     # Flag any retrieval errors.
     err = [(r["qa_id"], m) for r in rows for m in POOL
@@ -496,10 +517,17 @@ def build_report(rows: list[dict]) -> str:
 # --------------------------------------------------------------------------- #
 
 def main():
+    global EMBED_MODEL, COLL_SUFFIX
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--questions-main", type=Path, default=DEFAULT_MAIN)
     parser.add_argument("--questions-lexical", type=Path, default=DEFAULT_LEXICAL)
-    parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
+    parser.add_argument("--results", type=Path, default=None,
+                        help="Override results path (default: tagged by model).")
+    parser.add_argument("--embedding-model", type=str, default=EMBEDDING_MODEL,
+                        help=f"Query embedding model (default: {EMBEDDING_MODEL}). "
+                             f"Anything containing 'large' targets the *_large "
+                             f"vector collections built by the indexer.")
     parser.add_argument("--force", action="store_true",
                         help="Recompute all retrieval, ignoring stored results.")
     parser.add_argument("--analyze-only", action="store_true",
@@ -508,7 +536,24 @@ def main():
                         help="Skip the batched embedding prewarm pass.")
     args = parser.parse_args()
 
-    print("Loading questions...")
+    # Wire up the embedding variant. "large" in the model name -> _large
+    # collections and _large-tagged output files; otherwise the original
+    # small-model collection names and filenames (backward compatible).
+    EMBED_MODEL = args.embedding_model
+    is_large = "large" in EMBED_MODEL.lower()
+    COLL_SUFFIX = "_large" if is_large else ""
+    tag = "large" if is_large else "small"
+
+    results_path = args.results or (
+        DATA_PROCESSED / (f"coverage_results_{tag}.jsonl" if is_large
+                          else "coverage_results.jsonl"))
+    report_path = (DATA_PROCESSED / (f"coverage_report_{tag}.md" if is_large
+                                     else "coverage_report.md"))
+
+    print(f"Embedding model: {EMBED_MODEL}  (collections suffix: '{COLL_SUFFIX}')")
+    print(f"Results -> {results_path.name}   Report -> {report_path.name}")
+
+    print("\nLoading questions...")
     questions = load_questions(args.questions_main, args.questions_lexical)
     counts = {}
     for q in questions:
@@ -516,9 +561,9 @@ def main():
     print(f"  Loaded {len(questions):,}: " + ", ".join(f"{k}={v}" for k, v in counts.items()))
 
     if args.analyze_only:
-        results_by_id = load_existing(args.results)
+        results_by_id = load_existing(results_path)
         if not results_by_id:
-            print(f"No stored results at {args.results}. Run without --analyze-only first.")
+            print(f"No stored results at {results_path}. Run without --analyze-only first.")
             return
         rows = list(results_by_id.values())
     else:
@@ -526,14 +571,14 @@ def main():
             print("\nPrewarming query-embedding cache...")
             prewarm_cache(questions)
         print("\nRetrieving scene lists...")
-        results_by_id = retrieve_all(questions, args.results, args.force)
+        results_by_id = retrieve_all(questions, results_path, args.force)
         rows = list(results_by_id.values())
 
     print("\nAnalyzing...")
     report = build_report(rows)
-    REPORT_PATH.write_text(report)
+    report_path.write_text(report)
     print(report)
-    print(f"\n\nReport written to {REPORT_PATH}")
+    print(f"\n\nReport written to {report_path}")
 
 
 if __name__ == "__main__":
