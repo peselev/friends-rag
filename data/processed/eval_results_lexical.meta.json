@@ -23,5 +23,125 @@
     ],
     "questions_touched": 200,
     "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:24.484307+00:00",
+    "modes_computed": [
+      "bm25"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:26.307656+00:00",
+    "modes_computed": [
+      "vector"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:27.905072+00:00",
+    "modes_computed": [
+      "vector_naive"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:29.652827+00:00",
+    "modes_computed": [
+      "vector_window_noheader"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:31.666079+00:00",
+    "modes_computed": [
+      "vector_utterance_noheader"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:36.095809+00:00",
+    "modes_computed": [
+      "hybrid"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:42.843214+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T17:41:50.308336+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25_smart"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:58:50.175332+00:00",
+    "modes_computed": [
+      "vector"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:58:51.602000+00:00",
+    "modes_computed": [
+      "vector_naive"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:58:53.061614+00:00",
+    "modes_computed": [
+      "vector_window_noheader"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:58:54.596110+00:00",
+    "modes_computed": [
+      "vector_utterance_noheader"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:58:58.643503+00:00",
+    "modes_computed": [
+      "hybrid"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:59:04.700486+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
+  },
+  {
+    "timestamp": "2026-06-02T19:59:10.580141+00:00",
+    "modes_computed": [
+      "hybrid_window_bm25_smart"
+    ],
+    "questions_touched": 200,
+    "top_k": 10
   }
 ]

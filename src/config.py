@@ -37,6 +37,10 @@ GENERATION_MODEL = "claude-haiku-4-5"        # Anthropic: fast + cheap for demo
 
 # Retrieval settings
 TOP_K = 5   # Number of chunks to retrieve per query
+SEARCH_EF = 400   # HNSW query-time search depth, baked into each collection at
+                  # creation (Chroma 0.5.x can't change it afterward). Tuned via
+                  # scripts.search_ef_sweep: recovers ~full exact-search recall
+                  # for ~+3.5 ms/query, negligible next to rerank + generation.
 SCENE_COLLECTION = "friends_scenes"
 NAIVE_COLLECTION = "friends_naive"
 

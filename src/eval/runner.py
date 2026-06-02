@@ -22,22 +22,52 @@ from tqdm import tqdm
 from src.config import DATA_PROCESSED
 from src.unified_retriever import retrieve_unified, AVAILABLE_MODES
 
-TOP_K_FOR_EVAL = 10
+TOP_K_FOR_EVAL = 10          # how many unique SCENES we want to rank within
+RETRIEVE_DEPTH = 80          # chunks to fetch before scene-dedup; generous so
+                             # finer modes still yield TOP_K_FOR_EVAL scenes
 MAX_WORKERS = 4
 
 DEFAULT_QUESTIONS = DATA_PROCESSED / "eval_sample.jsonl"
 DEFAULT_RESULTS = DATA_PROCESSED / "eval_results.jsonl"
 
 
+def _parent_scene_id(r) -> str:
+    """Canonical scene id for a result. Matches the dedup key used by the live
+    pipeline (hybrid_window._parent_scene_id) and the coverage experiment, so
+    'scene' means the same thing everywhere: the unit the bot actually serves."""
+    return r.metadata.get("scene_id", r.scene_id)
+
+
+def _matches_target(r, target_scene_id: str) -> bool:
+    """Does this result belong to the gold scene? Keeps the original three-way
+    match so boundary-crossing naive chunks (started_in_scene) still count."""
+    return (
+        r.scene_id == target_scene_id
+        or r.metadata.get("scene_id") == target_scene_id
+        or r.metadata.get("started_in_scene") == target_scene_id
+    )
+
+
 def find_rank(results, target_scene_id: str) -> int | None:
-    """Return 1-indexed rank of target_scene_id in results, or None if absent."""
-    for i, r in enumerate(results, start=1):
-        if r.scene_id == target_scene_id:
-            return i
-        if r.metadata.get("scene_id") == target_scene_id:
-            return i
-        if r.metadata.get("started_in_scene") == target_scene_id:
-            return i
+    """Return the 1-indexed rank of target_scene_id among UNIQUE scenes.
+
+    Results are deduplicated to their parent scene (first occurrence wins)
+    before ranking, because multi-chunk-per-scene modes (window, utterance)
+    otherwise let several chunks of one scene occupy distinct rank slots --
+    which depresses recall@k versus what the bot, which dedupes to scenes
+    before serving, actually delivers. For bm25 and scene modes (one chunk
+    per scene) this is identical to the old chunk-level rank.
+    """
+    seen: set[str] = set()
+    rank = 0
+    for r in results:
+        sid = _parent_scene_id(r)
+        if sid in seen:
+            continue          # duplicate scene: does not consume a new rank slot
+        seen.add(sid)
+        rank += 1
+        if _matches_target(r, target_scene_id):
+            return rank
     return None
 
 
@@ -47,8 +77,11 @@ def run_modes_for_question(question: dict, modes: list[str]) -> dict:
     ranks = {}
     for mode in modes:
         try:
-            results = retrieve_unified(question["question"], mode=mode, top_k=TOP_K_FOR_EVAL)
-            ranks[mode] = find_rank(results, target)
+            results = retrieve_unified(question["question"], mode=mode, top_k=RETRIEVE_DEPTH)
+            rank = find_rank(results, target)
+            # Only count hits within the first TOP_K_FOR_EVAL unique scenes;
+            # deeper hits are misses for any k <= TOP_K_FOR_EVAL.
+            ranks[mode] = rank if (rank is not None and rank <= TOP_K_FOR_EVAL) else None
         except Exception as e:
             ranks[mode] = f"ERROR: {type(e).__name__}: {e}"
     return ranks

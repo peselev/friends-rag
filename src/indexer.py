@@ -23,7 +23,7 @@ from pathlib import Path
 
 import chromadb
 
-from src.config import DATA_PROCESSED, CHROMA_DIR, EMBEDDING_MODEL
+from src.config import DATA_PROCESSED, CHROMA_DIR, EMBEDDING_MODEL, SEARCH_EF
 from src.embedder import embed_texts
 
 DEFAULT_COLLECTION = "friends_scenes"
@@ -48,7 +48,7 @@ def get_or_reset_collection(client, name: str):
     if name in existing:
         print(f"  (Deleting existing '{name}' collection)")
         client.delete_collection(name)
-    return client.create_collection(name=name)
+    return client.create_collection(name=name, metadata={"hnsw:search_ef": SEARCH_EF})
 
 
 def index_chunks(
