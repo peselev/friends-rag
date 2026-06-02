@@ -39,9 +39,16 @@ GENERATION_MODEL = "claude-haiku-4-5"        # Anthropic: fast + cheap for demo
 TOP_K = 5   # Number of chunks to retrieve per query
 SCENE_COLLECTION = "friends_scenes"
 NAIVE_COLLECTION = "friends_naive"
-# New for granularity experiment
-UTTERANCE_COLLECTION = "friends_utterance"
-WINDOW_COLLECTION = "friends_window"
-# Header-less variants for the prefix-impact experiment
+
+# ⚠️ HEADER VARIANTS — DO NOT USE. These collections embed chunks with a
+# "Friends S01E01, Scene 1" prefix. Measured WORSE than the no-header variants
+# for window chunks (the boilerplate is a large fraction of a short chunk and
+# pulls the embedding toward the header instead of the dialogue). The matching
+# modes are commented out of AVAILABLE_MODES so they can't be run by accident.
+# Kept only as a paper trail. Use the *_NOHEADER_COLLECTION constants below.
+UTTERANCE_COLLECTION = "friends_utterance"   # ⚠️ header — do not use
+WINDOW_COLLECTION = "friends_window"         # ⚠️ header — do not use
+
+# Header-less variants — THESE ARE THE ONES TO USE.
 UTTERANCE_NOHEADER_COLLECTION = "friends_utterance_noheader"
 WINDOW_NOHEADER_COLLECTION = "friends_window_noheader"

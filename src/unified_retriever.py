@@ -12,9 +12,15 @@ from src.config import (
 from src.hybrid_retriever import retrieve_hybrid
 from src.retriever import RetrievalResult, retrieve, retrieve_from_collection
 
+# ⚠️ The two header modes ("vector_utterance", "vector_window") are DISABLED.
+# They embed a "Friends S01E01, Scene 1" prefix and measured worse than the
+# *_noheader variants for short chunks. They are commented out below so they
+# can never run by accident (retrieve_unified raises on any mode not listed).
+# Use "vector_utterance_noheader" / "vector_window_noheader" instead.
 AVAILABLE_MODES = (
     "vector", "vector_naive",
-    "vector_utterance", "vector_window",
+    # "vector_utterance",   # DISABLED — header variant, underperforms. Use _noheader.
+    # "vector_window",      # DISABLED — header variant, underperforms. Use _noheader.
     "vector_utterance_noheader", "vector_window_noheader",
     "bm25", "hybrid",
     "hybrid_window_bm25",
@@ -31,8 +37,8 @@ Modes: {", ".join(AVAILABLE_MODES)}
 _MODE_TO_COLLECTION = {
     "vector": SCENE_COLLECTION,
     "vector_naive": NAIVE_COLLECTION,
-    "vector_utterance": UTTERANCE_COLLECTION,
-    "vector_window": WINDOW_COLLECTION,
+    # "vector_utterance": UTTERANCE_COLLECTION,   # DISABLED — header variant
+    # "vector_window": WINDOW_COLLECTION,         # DISABLED — header variant
     "vector_utterance_noheader": UTTERANCE_NOHEADER_COLLECTION,
     "vector_window_noheader": WINDOW_NOHEADER_COLLECTION,
 }

@@ -21,6 +21,8 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
     smaller groups upstream for safer retries.
 
     Each output vector is 1536 floats for text-embedding-3-small.
+    NOTE: no caching here on purpose — this is the bulk/chunk path used by the
+    indexer. The query cache lives in embed_one().
     """
     if not texts:
         return []
@@ -34,5 +36,16 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
 
 
 def embed_one(text: str) -> list[float]:
-    """Convenience for embedding a single string (used at query time)."""
-    return embed_texts([text])[0]
+    """
+    Embed a single string (the query path).
+
+    Checks the on-disk query cache first; only calls OpenAI on a cache miss,
+    then stores the result. Makes repeated eval runs free for seen questions.
+    """
+    from src.embed_cache import _cache   # local import avoids an import cycle
+    cached = _cache.get(text)
+    if cached is not None:
+        return cached
+    vector = embed_texts([text])[0]
+    _cache.set(text, vector)
+    return vector
