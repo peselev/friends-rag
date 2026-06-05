@@ -4,9 +4,10 @@ Bootstrap script for HF Spaces deployment.
 Builds the Chroma collection the demo needs, if it doesn't exist.
 Runs on Space startup before app.py serves.
 
-The demo modes (hybrid_window_bm25, hybrid_window_bm25_reranked_bge) use
+The demo modes (hybrid_window_bm25, hybrid_window_bm25_reranked_cohere) use
 only ONE Chroma collection: friends_window_noheader. We build just that
-one, not the other 5 collections used during evaluation.
+one, not the other 5 collections used during evaluation. (Cohere reranks the
+fused scene text directly, so the reranker needs no extra collection.)
 """
 from pathlib import Path
 

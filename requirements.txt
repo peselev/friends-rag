@@ -11,7 +11,13 @@ streamlit==1.40.0
 # Retrieval
 rank-bm25==0.2.2
 
-# Reranker (also brings torch, transformers, tokenizers)
+# Reranker — Cohere rerank-v3.5 (the shipped "higher accuracy" path)
+cohere==7.0.3
+
+# Local cross-encoders (MiniLM/BGE) — used only by scripts/reranker_experiment.py
+# and the experiment-only modes, NOT by the live demo. Brings torch + transformers,
+# the heaviest part of the image. Safe to remove for a lighter/faster cold start if
+# you don't run the local rerankers in this environment.
 sentence-transformers==5.5.1
 
 # Numerics (numpy comes via chromadb but pin to avoid surprises)

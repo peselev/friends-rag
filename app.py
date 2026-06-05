@@ -11,6 +11,8 @@ import os
 import streamlit as st
 
 from src.generator import answer_question
+from src.config import RERANK_FINAL_K, TOP_K
+from src.cohere_reranker import CohereUnavailable
 
 st.set_page_config(page_title="Friends — Grounded Q&A", page_icon="☕", layout="centered")
 
@@ -106,11 +108,27 @@ def render_answer(result):
 
 
 def run_query(question: str, use_reranker: bool):
-    mode = "hybrid_window_bm25_reranked_bge" if use_reranker else "hybrid_window_bm25"
-    msg = ("Retrieving scenes, reranking, and asking Claude..."
-           if use_reranker else "Retrieving scenes and asking Claude...")
-    with st.spinner(msg):
-        result = answer_question(question, mode=mode)
+    if use_reranker:
+        # Higher-accuracy path: deeper fused pool -> Cohere rerank-v3.5.
+        # If Cohere is unavailable for any reason, fall back silently to the
+        # fast hybrid and tell the user the toggle quietly stepped down.
+        with st.spinner("Retrieving scenes, reranking with Cohere, and asking Claude..."):
+            try:
+                result = answer_question(
+                    question,
+                    mode="hybrid_window_bm25_reranked_cohere",
+                    top_k=RERANK_FINAL_K,
+                )
+            except CohereUnavailable:
+                result = answer_question(question, mode="hybrid_window_bm25", top_k=TOP_K)
+                st.markdown(
+                    "<div class='grounding-note'>Reranker unavailable — showing fast "
+                    "results.</div>",
+                    unsafe_allow_html=True,
+                )
+    else:
+        with st.spinner("Retrieving scenes and asking Claude..."):
+            result = answer_question(question, mode="hybrid_window_bm25", top_k=TOP_K)
     render_answer(result)
 
 
@@ -158,7 +176,8 @@ for i, (q, note) in enumerate(EXAMPLES):
 use_reranker = st.checkbox(
     "Higher accuracy (slower)",
     key="use_reranker",
-    help="Adds a second-stage cross-encoder reranker. ~3s vs ~200ms.",
+    help="Re-ranks a deeper candidate pool with Cohere's rerank-v3.5. It's a "
+         "metered API call, so it adds a couple of seconds vs ~200ms for the fast mode.",
 )
 
 # --- Input row: text field (keyed, no value=) + Ask button to the right ---

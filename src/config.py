@@ -24,6 +24,12 @@ if not ANTHROPIC_API_KEY:
 if not OPENAI_API_KEY:
     raise ValueError("OPENAI_API_KEY not found in .env file")
 
+# Cohere keys are OPTIONAL — the "higher accuracy" toggle degrades gracefully
+# if they're missing (see src/cohere_reranker.py). Trial key first, prod key as
+# fallback when the trial key is rate-limited or hits its monthly cap.
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+COHERE_API_KEY_PROD = os.getenv("COHERE_API_KEY_PROD")
+
 # Paths
 DATA_RAW = PROJECT_ROOT / "data" / "raw"
 DATA_PROCESSED = PROJECT_ROOT / "data" / "processed"
@@ -34,9 +40,17 @@ CHROMA_DIR = PROJECT_ROOT / "chroma_db"
 # Model choices
 EMBEDDING_MODEL = "text-embedding-3-small"   # OpenAI: cheap, 1536 dimensions
 GENERATION_MODEL = "claude-haiku-4-5"        # Anthropic: fast + cheap for demo
+COHERE_RERANK_MODEL = "rerank-v3.5"          # Cohere: the only reranker that earned its place
 
 # Retrieval settings
 TOP_K = 5   # Number of chunks to retrieve per query
+
+# "Higher accuracy" (Cohere) mode depths. Twenty candidates is the operating
+# point: a reranker can only reorder what it's handed, and depth past ~20 adds
+# noise faster than reachable gold scenes (see the writeup's N=20 vs N=50
+# comparison). Five is what the LLM answers from. These match the writeup.
+RERANK_CANDIDATE_DEPTH = 20   # fused candidates fed to Cohere
+RERANK_FINAL_K = 5            # scenes returned to the LLM
 SEARCH_EF = 400   # HNSW query-time search depth, baked into each collection at
                   # creation (Chroma 0.5.x can't change it afterward). Tuned via
                   # scripts.search_ef_sweep: recovers ~full exact-search recall

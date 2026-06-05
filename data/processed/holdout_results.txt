@@ -1,0 +1,107 @@
+================================================================================
+QUERY: Who was Joey in love with?
+================================================================================
+
+--- Mode: hybrid_window_bm25 ---
+
+Retrieved scenes:
+  1. S05E16, Scene 7
+  2. S07E18, Scene 6
+  3. S09E19, Scene 12
+  4. S08E16, Scene 9
+  5. S09E17, Scene 2
+
+Claude's answer:
+Based on the provided scenes, Joey was in love with **Rachel Green**.
+
+This is established in multiple scenes:
+
+1. In S09E19, Scene 12, Joey tells Rachel directly: "I've never played that!...just once...with you..." when discussing being in love. He then elaborates on his feelings, describing how he wanted to grab and kiss her but couldn't, and how he would watch her in the mornings thinking she was beautiful, even though it hurt because he couldn't tell her.
+
+2. In S08E16, Scene 9, Joey explicitly confesses to Rachel at a restaurant: "I think I'm...falling in love with you" and repeats "I'm falling in love with you" when she asks him to clarify.
+
+3. In S05E16, Scene 7, there's an earlier indication when Joey has a dream about Monica and realizes through conversation that what he really wants is to have closeness and a girlfriend like Chandler and Monica have together, which foreshadows his later romantic feelings for Rachel.
+
+
+--- Mode: hybrid_window_bm25_reranked_cohere ---
+
+Retrieved scenes:
+  1. S02E04, Scene 2
+  2. S01E13, Scene 3
+  3. S05E16, Scene 7
+  4. S04E05, Scene 8
+  5. S09E19, Scene 12
+
+Claude's answer:
+Based on the provided scenes, Joey was in love with **Rachel Green**.
+
+In S09E19, Scene 12, Joey explicitly tells Rachel: "Uh...well...just once...with you..." He then goes on to describe his feelings in detail, explaining how he wanted to grab and kiss her but couldn't, and how he would look at her in the mornings thinking she was beautiful, even though it hurt because he knew he could never tell her.
+
+================================================================================
+QUERY: Who did Joey have feelings for in season 8?
+================================================================================
+
+--- Mode: hybrid_window_bm25 ---
+
+Retrieved scenes:
+  1. S09E24, Scene 12
+  2. S02E01, Scene 10
+  3. S04E23, Scene 8
+  4. S05E12, Scene 1
+  5. S08E13, Scene 8
+
+Claude's answer:
+According to the scenes provided, Joey had feelings for Rachel in season 8. 
+
+In S08E13, Scene 8, Joey tells Phoebe: "I know. I know. And this is so much more complicated than it was for those guys. I mean, it's Rachel for God sakes." He further explains: "And she's not only my friend; she's my pregnant friend! She's my pregnant friend who's Ross' ex!" Joey also mentions that he tried to make a list of things he didn't like about her to get rid of the feelings, but could only come up with one thing: "She made me switch to light Mayo."
+
+
+--- Mode: hybrid_window_bm25_reranked_cohere ---
+
+Retrieved scenes:
+  1. S08E13, Scene 8
+  2. S09E24, Scene 10
+  3. S04E08, Scene 8
+  4. S08E16, Scene 1
+  5. S09E24, Scene 8
+
+Claude's answer:
+According to the scenes provided, Joey had feelings for Rachel in season 8.
+
+In S08E13, Scene 8, Phoebe confronts Joey about his feelings, saying "I know about your feelings." Joey then confirms: "I mean, it's Rachel for God sakes." He explains to Phoebe that he's been trying to get rid of these feelings and even made "a list of everything I don't like about her," but could only come up with one thing: "She made me switch to light Mayo."
+
+This is further confirmed in S08E16, Scene 1, where Joey tells Ross at Central Perk: "It's Rachel." When Ross expresses shock, Joey acknowledges the complicated nature of the situation, noting that Rachel is "carrying my baby" and that he and Ross are "really good friends."
+
+================================================================================
+QUERY: What did Joey confess to Rachel at the restaurant?
+================================================================================
+
+--- Mode: hybrid_window_bm25 ---
+
+Retrieved scenes:
+  1. S08E12, Scene 2
+  2. S08E16, Scene 9
+  3. S06E15, Scene 7
+  4. S09E19, Scene 9
+  5. S05E12, Scene 1
+
+Claude's answer:
+At the restaurant, Joey confessed to Rachel that he was falling in love with her (S08E16, Scene 9). 
+
+Specifically, Joey said: "I'm falling in love with you." When Rachel initially thought he was joking, he clarified that he was serious. He explained that over the past few weeks, his feelings had developed, and he told her "I think I'm...falling in love with you" (S08E16, Scene 9).
+
+
+--- Mode: hybrid_window_bm25_reranked_cohere ---
+
+Retrieved scenes:
+  1. S08E16, Scene 9
+  2. S08E12, Scene 2
+  3. S08E17, Scene 3
+  4. S02E05, Scene 2
+  5. S08E01, Scene 3
+
+Claude's answer:
+According to the scenes provided, Joey confessed to Rachel that he was falling in love with her at a restaurant (S08E16, Scene 9).
+
+During their dinner, Joey told Rachel: "I'm falling in love with you." When Rachel initially thought he was joking, Joey clarified that he was serious. He explained that over the past few weeks, his feelings for her had developed, and he wanted her to know how he felt.
+

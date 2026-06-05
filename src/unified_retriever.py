@@ -27,6 +27,7 @@ AVAILABLE_MODES = (
     "hybrid_window_bm25_smart",
     "hybrid_window_bm25_reranked",
     "hybrid_window_bm25_reranked_bge",
+    "hybrid_window_bm25_reranked_cohere",
 )
 
 _USAGE = f"""Usage: python -m src.unified_retriever <mode> "<query>"
@@ -80,6 +81,17 @@ def retrieve_unified(
         from src.reranker import rerank
         candidates = retrieve_hybrid_window(query, top_k=20)
         return rerank(query, candidates, top_k=top_k, model_name=BGE_RERANKER)
+
+    if mode == "hybrid_window_bm25_reranked_cohere":
+        # The shipped "higher accuracy" path. Fuse the equal-weight top-N, hand
+        # them to Cohere rerank-v3.5, keep the best. cohere_rerank raises
+        # CohereUnavailable on any failure; the app catches it and falls back to
+        # the fast hybrid (we deliberately do NOT swallow it here).
+        from src.config import RERANK_CANDIDATE_DEPTH
+        from src.cohere_reranker import cohere_rerank
+        from src.hybrid_window import retrieve_hybrid_window
+        candidates = retrieve_hybrid_window(query, top_k=RERANK_CANDIDATE_DEPTH)
+        return cohere_rerank(query, candidates, top_k=top_k)
 
     # Pure vector modes (dispatch by collection)
     collection_name = _MODE_TO_COLLECTION[mode]

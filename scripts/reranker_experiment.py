@@ -260,7 +260,7 @@ def main():
 
     print("\n" + table + "\n")
 
-    out = DATA_PROCESSED / "reranker_experiment.md"
+    out = DATA_PROCESSED / f"reranker_experiment_n{args.candidate_depth}.md"
     with open(out, "w") as f:
         f.write("# Friends RAG - Reranker experiment\n\n")
         f.write(f"Candidate depth N={args.candidate_depth}, "
