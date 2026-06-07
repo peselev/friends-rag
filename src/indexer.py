@@ -23,7 +23,7 @@ from pathlib import Path
 
 import chromadb
 
-from src.config import DATA_PROCESSED, CHROMA_DIR, EMBEDDING_MODEL, SEARCH_EF
+from src.config import DATA_PROCESSED, CHROMA_DIR, CHROMA_SETTINGS, EMBEDDING_MODEL, SEARCH_EF
 from src.embedder import embed_texts
 
 DEFAULT_COLLECTION = "friends_scenes"
@@ -63,7 +63,7 @@ def index_chunks(
     print(f"  Loaded {len(chunks):,} chunks")
 
     print(f"\nConnecting to Chroma at {CHROMA_DIR}...")
-    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+    client = chromadb.PersistentClient(path=str(CHROMA_DIR), settings=CHROMA_SETTINGS)
     collection = get_or_reset_collection(client, collection_name)
 
     print(f"\nEmbedding with '{embedding_model}' and indexing into "

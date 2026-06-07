@@ -70,3 +70,10 @@ WINDOW_COLLECTION = "friends_window"         # ⚠️ header — do not use
 # Header-less variants — THESE ARE THE ONES TO USE.
 UTTERANCE_NOHEADER_COLLECTION = "friends_utterance_noheader"
 WINDOW_NOHEADER_COLLECTION = "friends_window_noheader"
+
+# Shared Chroma client settings. Used everywhere we open a PersistentClient so
+# the writer (indexer), the reader (retriever), and bootstrap all agree.
+# anonymized_telemetry=False avoids the telemetry path that's noisy/flaky in the
+# HF container; allow_reset lets bootstrap wipe a corrupt store and rebuild.
+from chromadb.config import Settings  # noqa: E402  (kept next to its use)
+CHROMA_SETTINGS = Settings(anonymized_telemetry=False, allow_reset=True)

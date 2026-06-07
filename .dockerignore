@@ -1,4 +1,3 @@
-cat > .dockerignore << 'EOF'
 # Secrets — NEVER copy into image
 .env
 .env.*
@@ -45,4 +44,3 @@ app_compare.py
 test_keys.py
 run_eval_overnight.sh
 notebooks/
-EOF

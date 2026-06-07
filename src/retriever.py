@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 import chromadb
 
-from src.config import CHROMA_DIR, EMBEDDING_MODEL, SCENE_COLLECTION, TOP_K
+from src.config import CHROMA_DIR, CHROMA_SETTINGS, EMBEDDING_MODEL, SCENE_COLLECTION, TOP_K
 from src.embedder import embed_one
 
 
@@ -31,7 +31,7 @@ class RetrievalResult:
         return "(unknown source)"   
     
 
-_client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+_client = chromadb.PersistentClient(path=str(CHROMA_DIR), settings=CHROMA_SETTINGS)
 _collections: dict[str, chromadb.Collection] = {}
 
 
